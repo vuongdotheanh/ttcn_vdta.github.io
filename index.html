@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Web Demo - Thử Thách & Thông tin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            /* Nền GIF: Đảm bảo các file ảnh nằm trong thư mục 'images' */
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+                        url('images/c5ee60e6f1766167e34d7f06e3ae20dc.gif') center center no-repeat fixed; 
+            background-size: cover; 
+            
+            text-align: center;
+            padding: 50px 20px;
+            color: white;
+            min-height: 100vh;
+        }
+        h1 { color: #ff80c0; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); }
+        h2 { color: #00bfff; margin-bottom: 30px; }
+        
+        /* STYLE CHUNG CHO NÚT & LIÊN KẾT */
+        button {
+            padding: 12px 25px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #00bfff;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+            margin-right: 10px;
+        }
+        button:hover:not(:disabled) { 
+            background-color: #0099cc; 
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* STYLE CHO KHỐI THÔNG TIN LIÊN LẠC (#info) */
+        #info {
+            margin: 20px auto;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border-radius: 15px;
+            max-width: 450px;
+            font-size: 18px;
+            display: none;
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: 0.5s;
+        }
+        #info:hover { background-color: rgba(255, 255, 255, 0.2); }
+        #info p { margin: 15px 0; display: flex; align-items: center; }
+        p i { margin-right: 12px; color: #00ffff; min-width: 25px; text-align: center; }
+        a { color: #80dfff; text-decoration: none; transition: 0.3s; }
+        a:hover { text-decoration: underline; color: #00ffff; }
+        
+        /* STYLE CHO KHỐI CÂU ĐỐ & PHẦN THƯỞNG */
+        #quiz-container, #reward-box {
+            margin: 30px auto;
+            padding: 25px;
+            max-width: 550px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            border: 2px solid #00bfff;
+            text-align: left;
+            box-shadow: 0 0 20px rgba(0, 191, 255, 0.5);
+        }
+        #quiz-container h3, #reward-box h3 {
+            text-align: center;
+            color: #ffcc00; 
+            margin-bottom: 20px;
+        }
+        .question {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 15px;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .options button {
+            padding: 10px;
+            background-color: #00bfff;
+            border: 1px solid #00bfff;
+            font-size: 1em;
+            width: 100%;
+            text-align: left; /* Căn lề trái cho đáp án */
+        }
+        
+        /* Style cho phản hồi */
+        #feedback {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        /* Style cho phần thưởng */
+        .reward-content {
+            text-align: center;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .reward-content i {
+            font-size: 2.5em;
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+        .reward-image {
+            max-width: 100px; /* Giới hạn chiều rộng của ảnh */
+            height: auto;
+            margin: 15px auto;
+            display: block;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(255, 204, 0, 0.5); 
+        }
+    </style>
+</head>
+<body>
+    <h1 id="mainTitle">Xin chào!</h1>
+    <h2></h2>
+    <p>Chào mừng bạn.</p>
+
+    <div id="quiz-container">
+        <h3>💡 Thử Thách Đố Vui Nhận Thưởng💡</h3>
+        
+        <div id="question-display">
+            </div>
+
+        <p id="feedback" style="display: none;"></p>
+        <button id="next-button" onclick="nextQuestion()" style="display: none;">
+            Tiếp theo <i class="fa-solid fa-arrow-right"></i>
+        </button>
+    </div>
+    <div id="reward-box" style="display: none;">
+        <h3>🎉 CHÚC MỪNG BẠN NHẬN THƯỞNG! 🎉</h3>
+        <p>Bạn đã hoàn thành thử thách với điểm số cao. Đây là phần thưởng của bạn:</p>
+        <div class="reward-content">
+            <i class="fa-solid fa-gift"></i>
+            <img src="images/z7082204351062_21f10af823de83c9343def0204f69631.jpg" alt="Phần thưởng đặc biệt" class="reward-image">
+            <p style="color: #ffcc00; font-size: 1.2em; font-weight: bold;">Chúc mừng bạn, bạn hãy donate cho tôi để được nhận quà. HeHe!</p>
+            <p> <span style="color: #00ffff;">Thank You</span>, bạn là người tuyệt vời nhất mà tôi từng gặp.</p>
+        </div>
+        <button onclick="resetQuiz()" style="margin-top: 20px;">Làm lại!</button>
+    </div>
+    <button id="infoButton" onclick="toggleInfo()">
+        <i class="fa-solid fa-address-card"></i> Nhận thông tin liên lạc
+    </button>
+
+    <div id="info">
+        <p><i class="fa-solid fa-user"></i><strong>Tên: </strong>  Vương Đỗ Thế Anh</p>
+        <p><i class="fa-solid fa-phone"></i><strong>SĐT: </strong>  0336169126</p>
+        <p><i class="fa-solid fa-envelope"></i><strong>Email: </strong> <a href="mailto:thengudot1233@gmail.com"> thengudot1233@gmail.com</a></p>
+        <p><i class="fa-brands fa-facebook"></i><strong>Facebook: </strong> 
+           <a href="https://www.facebook.com/tanhvodung.sloww" target="_blank"> https://www.facebook.com/tanhvodung.sloww</a></p>
+        <p><i class="fa-solid fa-comment-dots"></i><strong>Zalo: </strong>  0336169126</p>
+    </div>
+
+    <script>
+        // 1. MẢNG CÁC CÂU HỎI VÀ ĐÁP ÁN (50 Câu đố)
+        const ALL_QUIZ_QUESTIONS = [
+            { question: "Da cóc mà bọc bột lọc, bột lọc mà bọc hòn than. Là quả gì?", options: ["A. Quả roi", "B. Quả ổi", "C. Quả nhãn"], answer: "C" },
+            { question: "Thân em trắng nõn nà, đầu đội nón xanh. Là cây gì?", options: ["A. Cây nấm", "B. Cây giá đỗ", "C. Cây hành"], answer: "B" },
+            { question: "Cũng gọi là hạt, nhưng chẳng nảy mầm, rơi vãi khắp sân, đêm hè lấp lánh?", options: ["A. Hạt cát", "B. Hạt mưa", "C. Hạt sương"], answer: "B" },
+            { question: "Quả gì vỏ nhiều gai, ruột vàng như nghệ, ăn vào ngọt thơm?", options: ["A. Quả mít", "B. Quả sầu riêng", "C. Quả chôm chôm"], answer: "A" },
+            { question: "Thân cằn cỗi, lá khẳng khiu, đông về lột áo, hè lại xanh um?", options: ["A. Cây bàng", "B. Cây thông", "C. Cây si"], answer: "A" },
+            { question: "Quả gì tên gọi như kim loại quý, vỏ xanh ruột đỏ, mát lạnh ngày hè?", options: ["A. Quả cam", "B. Quả dưa hấu", "C. Quả dứa"], answer: "B" },
+            { question: "Hoa gì nở trên cành, rồi rơi xuống đất nuôi mình?", options: ["A. Hoa lạc (đậu phộng)", "B. Hoa mai", "C. Hoa hồng"], answer: "A" },
+            { question: "Cây gì không cành, chỉ có một thân, lá như lược thưa?", options: ["A. Cây tre", "B. Cây cau", "C. Cây chuối"], answer: "B" },
+            { question: "Quả gì có mắt xung quanh, chín vàng thơm phức, ai ăn cũng khen?", options: ["A. Quả xoài", "B. Quả dứa (thơm)", "C. Quả mít"], answer: "B" },
+            { question: "Tên một loài hoa, lại là tên một con sông?", options: ["A. Hoa Hồng", "B. Hoa Huệ", "C. Hoa Sen"], answer: "A" },
+            { question: "Vốn dòng ái quốc, một dạ trung trinh, hè về đỏ rực, sân trường chúng em?", options: ["A. Hoa phượng", "B. Hoa bằng lăng", "C. Hoa đào"], answer: "A" },
+            { question: "Cây gì lá tựa con dao, quả tựa con trâu, sống trên đồi núi?", options: ["A. Cây dứa dại", "B. Cây chuối", "C. Cây tre"], answer: "A" },
+            { question: "Thân tròn nhiều đốt, lá tựa gươm đao, ruột đặc ngọt ngào?", options: ["A. Cây trúc", "B. Cây mía", "C. Cây sậy"], answer: "B" },
+            { question: "Cây gì thân cao, lá to như quạt, cho bóng mát rượi, quả kết thành buồng?", options: ["A. Cây dừa", "B. Cây cọ", "C. Cây chuối"], answer: "B" },
+            { question: "Quả gì nhiều mắt, không có lông mày, chín vàng thơm lừng, xếp thành một nải?", options: ["A. Quả chuối", "B. Quả nhãn", "C. Quả nho"], answer: "A" },
+            { question: "Lá thì trên mây, củ thì dưới đất. Là cây gì?", options: ["A. Cây cà rốt", "B. Cây khoai lang", "C. Cây cà chua"], answer: "B" },
+            { question: "Cây gì không lá không hoa, mà ai cũng gọi là bà cụ non?", options: ["A. Cây xương rồng", "B. Cây nấm", "C. Cây rêu"], answer: "A" },
+            { question: "Hoa gì chỉ nở về đêm, hương thơm ngan ngát, trắng tinh dịu dàng?", options: ["A. Hoa sứ", "B. Hoa quỳnh", "C. Hoa nhài"], answer: "B" },
+            { question: "Quả gì tên gọi chẳng thơm, ăn vào lại khiến người ta ngại gần?", options: ["A. Quả sầu riêng", "B. Quả mít", "C. Quả bưởi"], answer: "A" },
+            { question: "Củ gì đo đỏ, thỏ rất thích ăn?", options: ["A. Củ cải", "B. Củ cà rốt", "C. Củ khoai tây"], answer: "B" },
+            { question: "Lá thì cuộn tròn, bọc lấy thân mình, càng vào càng trắng?", options: ["A. Cây bắp cải", "B. Cây rau diếp", "C. Cây xà lách"], answer: "A" },
+            { question: "Hoa gì tên gọi như mặt trời?", options: ["A. Hoa đồng tiền", "B. Hoa hướng dương", "C. Hoa cúc"], answer: "B" },
+            { question: "Gần bùn mà chẳng hôi tanh mùi bùn. Là hoa gì?", options: ["A. Hoa súng", "B. Hoa sen", "C. Hoa ly"], answer: "B" },
+            { question: "Quả gì có vỏ màu nâu, ruột trắng, nước ngọt mát lành?", options: ["A. Quả dừa", "B. Quả bưởi", "C. Quả dưa hấu"], answer: "A" },
+            { question: "Cây gì mà lại có răng, không nhai không nói, không ăn bao giờ?", options: ["A. Cây cưa", "B. Cây lược", "C. Cây kéo"], answer: "B" },
+            { question: "Quả gì có vỏ xanh rì, ruột chia năm múi, nấu canh chua ngon?", options: ["A. Quả bưởi", "B. Quả khế", "C. Quả cam"], answer: "B" },
+            { question: "Hoa gì báo hiệu xuân về, nở vàng rực rỡ khắp miền Nam ta?", options: ["A. Hoa đào", "B. Hoa cúc", "C. Hoa mai"], answer: "C" },
+            { question: "Cây gì một mẹ, sinh được vạn con, con nào con nấy, áo quần xác xơ?", options: ["A. Cây chuối", "B. Cây tre", "C. Cây dừa"], answer: "A" },
+            { question: "Quả gì tên gọi thật kiêu sa, vừa là quả ăn, vừa là đồ chơi?", options: ["A. Quả bóng", "B. Quả nho", "C. Quả cam"], answer: "A" },
+            { question: "Củ gì mặc áo nhiều lớp, càng bóc càng cay xè mắt?", options: ["A. Củ hành", "B. Củ tỏi", "C. Củ khoai tây"], answer: "A" },
+            { question: "Hoa gì báo hiệu học trò nghỉ hè?", options: ["A. Hoa bằng lăng", "B. Hoa phượng", "C. Hoa sữa"], answer: "B" },
+            { question: "Quả gì tên gọi như một loài chim?", options: ["A. Quả bồ câu", "B. Quả quạ", "C. Quả chim ưng"], answer: "B" },
+            { question: "Lá xanh, bông trắng, lại chen nhụy vàng. Là hoa gì?", options: ["A. Hoa lan", "B. Hoa cúc", "C. Hoa huệ"], answer: "B" },
+            { question: "Cây gì sinh ra đã bị trói?", options: ["A. Cây bó củi", "B. Cây rơm", "C. Cây tre"], answer: "A" },
+            { question: "Quả gì gai góc, béo ngậy bên trong, là vua các loại quả?", options: ["A. Quả sầu riêng", "B. Quả mít", "C. Quả chôm chôm"], answer: "A" },
+            { question: "Hoa gì tên gọi là mười, chỉ nở khi nắng, tắt khi chiều tà?", options: ["A. Hoa mười giờ", "B. Hoa phù dung", "C. Hoa lan"], answer: "A" },
+            { question: "Cây gì xanh lá, quả tròn, vỏ có đốm trắng, ruột son rất mềm?", options: ["A. Cây mít", "B. Cây đu đủ", "C. Cây ổi"], answer: "B" },
+            { question: "Cây gì nho nhỏ, hạt nó nuôi người, chín vàng khắp nơi, dân làng đi hái?", options: ["A. Cây ngô", "B. Cây lúa", "C. Cây khoai"], answer: "B" },
+            { question: "Hoa gì màu tím, mọc thành từng chùm, rung rinh trong gió?", options: ["A. Hoa bằng lăng", "B. Hoa tử đinh hương", "C. Hoa cẩm tú cầu"], answer: "A" },
+            { question: "Quả gì vỏ tím, ruột trắng ngà, ăn rất ngọt?", options: ["A. Quả nho", "B. Quả măng cụt", "C. Quả mận"], answer: "B" },
+            { question: "Củ gì có tên mà không có họ?", options: ["A. Củ từ", "B. Củ khoai", "C. Củ lạc"], answer: "A" },
+            { question: "Quả gì tên gọi như cái tai người?", options: ["A. Quả mộc nhĩ (nấm mèo)", "B. Quả tai tượng", "C. Quả nấm hương"], answer: "A" },
+            { question: "Cây gì chỉ có một lá?", options: ["A. Cây bài", "B. Cây tre", "C. Cây lưỡi hổ"], answer: "A" },
+            { question: "Hoa gì nở trắng sân trường, hương thơm thoang thoảng vấn vương lòng người?", options: ["A. Hoa nhài", "B. Hoa sữa", "C. Hoa sen"], answer: "B" },
+            { question: "Quả gì tròn xoe, có nhiều múi, vị chua ngọt, nhiều vitamin C?", options: ["A. Quả chanh", "B. Quả cam", "C. Quả bưởi"], answer: "B" },
+            { question: "Cây gì mang họ của loài chim, quả nó nấu chè rất ngon?", options: ["A. Cây đậu xanh", "B. Cây đậu đen", "C. Cây đậu nành"], answer: "A" },
+            { question: "Củ gì mọc dưới đất, ruột màu tím, nấu canh rất bùi?", options: ["A. Củ khoai tây", "B. Củ khoai sọ", "C. Củ dền"], answer: "B" },
+            { question: "Quả gì tên gọi rất hiền, nhưng ăn vào lại rất cay?", options: ["A. Quả ớt", "B. Quả chanh", "C. Quả khế"], answer: "A" },
+            { question: "Hoa gì tên gọi vừa sạch lại vừa thơm?", options: ["A. Hoa ly", "B. Hoa hồng", "C. Hoa cúc"], answer: "A" },
+            { question: "Cây gì sống ở trên non, mùa đông lá rụng, mùa xuân đâm chồi?", options: ["A. Cây đào", "B. Cây mơ", "C. Cây mận"], answer: "A" }
+        ];
+
+        const NUMBER_OF_QUESTIONS = 10; 
+        const MIN_CORRECT_FOR_REWARD = 4; // Điều kiện nhận thưởng: Đúng 4 câu trở lên
+        
+        let quizQuestions = [];
+        let currentQuestionIndex = 0;
+        let correctAnswersCount = 0;
+
+        // Hàm Xáo trộn (Fisher-Yates Shuffle)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+        
+        // KHỞI TẠO QUIZ: Xáo trộn và chọn 10 câu ngẫu nhiên
+        document.addEventListener('DOMContentLoaded', () => {
+            shuffleArray(ALL_QUIZ_QUESTIONS); 
+            quizQuestions = ALL_QUIZ_QUESTIONS.slice(0, NUMBER_OF_QUESTIONS);
+            loadQuestion();
+        });
+
+        // Tải Câu hỏi hiện tại
+        function loadQuestion() {
+            const display = document.getElementById('question-display');
+            const feedback = document.getElementById('feedback');
+            const nextButton = document.getElementById('next-button');
+            
+            feedback.style.display = 'none';
+            nextButton.style.display = 'none';
+
+            if (currentQuestionIndex < quizQuestions.length) {
+                const q = quizQuestions[currentQuestionIndex];
+                
+                let questionNumber = currentQuestionIndex + 1;
+                
+                let html = `<p class="question">${questionNumber}. ${q.question}</p><div class="options">`;
+                
+                q.options.forEach((opt, index) => {
+                    const optionChar = String.fromCharCode(65 + index);
+                    // Hiển thị đáp án dưới dạng A. Đáp án 
+                    let buttonText = opt.includes('.') ? opt : optionChar + '. ' + opt; 
+                    html += `<button onclick="checkAnswer('${q.answer}', '${opt}')">${buttonText}</button>`;
+                });
+                
+                html += `</div>`;
+                display.innerHTML = html;
+            }
+        }
+
+        // Kiểm tra đáp án được chọn
+        function checkAnswer(correctAnswer, selectedOptionText) {
+            const q = quizQuestions[currentQuestionIndex];
+            const feedback = document.getElementById('feedback');
+            const nextButton = document.getElementById('next-button');
+            const options = document.querySelectorAll('#question-display .options button');
+            
+            // Lấy ký tự đáp án (A, B, C)
+            let selectedAnswer = selectedOptionText.substring(0, 1);
+            let isCorrect = selectedAnswer === q.answer;
+
+            options.forEach(button => {
+                button.disabled = true;
+                // Highlight lựa chọn của người dùng
+                if (button.innerText.includes(selectedAnswer)) {
+                     button.style.border = '2px solid #ffcc00';
+                }
+            });
+
+            if (isCorrect) {
+                correctAnswersCount++;
+                feedback.style.color = '#38ff38';
+                feedback.innerText = 'Chính xác! Chuẩn bị cho câu tiếp theo.';
+            } else {
+                feedback.style.color = '#ff4d4d';
+                
+                let correctOptionText = q.options.find(opt => opt.substring(0, 1) === q.answer) || q.answer;
+
+                feedback.innerText = `Rất tiếc, đáp án sai. Đáp án đúng là ${correctOptionText}.`;
+                
+                // Highlight đáp án đúng
+                options.forEach(button => {
+                    if (button.innerText.includes(q.answer)) {
+                         button.style.backgroundColor = '#38ff38';
+                         button.style.color = 'black';
+                    }
+                });
+            }
+            
+            feedback.style.display = 'block';
+            nextButton.style.display = 'block';
+            
+            if (currentQuestionIndex === quizQuestions.length - 1) {
+                nextButton.innerHTML = 'Hoàn thành <i class="fa-solid fa-trophy"></i>';
+            }
+        }
+
+        // Chuyển sang Câu hỏi tiếp theo hoặc Kết thúc Quiz
+        function nextQuestion() {
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex < quizQuestions.length) {
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        // KẾT THÚC QUIZ: Kiểm tra điều kiện >= 4 câu đúng
+        function finishQuiz() {
+            const quizContainer = document.getElementById('quiz-container');
+            const rewardBox = document.getElementById('reward-box');
+            const finalTitle = document.getElementById('mainTitle');
+            
+            quizContainer.style.display = 'none';
+
+            if (correctAnswersCount >= MIN_CORRECT_FOR_REWARD) {
+                finalTitle.innerText = "🏆 CHÚC MỪNG BẠN NHẬN THƯỞNG! 🏆";
+                rewardBox.style.display = 'block';
+            } else {
+                finalTitle.innerText = "Tiếc quá!";
+                rewardBox.style.display = 'none';
+                quizContainer.style.display = 'block';
+                quizContainer.innerHTML = '<h3>Bạn đã trả lời đúng ' + correctAnswersCount + '/' + quizQuestions.length + ' câu. Bạn cần đúng ' + MIN_CORRECT_FOR_REWARD + ' câu trở lên để nhận phần thưởng.</h3><button onclick="resetQuiz()">Làm lại</button>';
+            }
+        }
+
+        // Hàm Reset Quiz
+        function resetQuiz() {
+            currentQuestionIndex = 0;
+            correctAnswersCount = 0;
+            document.getElementById('reward-box').style.display = 'none';
+            document.getElementById('mainTitle').innerText = "Xin chào, đây là web demo!";
+            
+            // Xáo trộn và chọn lại 10 câu hỏi ngẫu nhiên
+            shuffleArray(ALL_QUIZ_QUESTIONS);
+            quizQuestions = ALL_QUIZ_QUESTIONS.slice(0, NUMBER_OF_QUESTIONS);
+
+            loadQuestion();
+            document.getElementById('quiz-container').style.display = 'block';
+        }
+        
+        // Hàm ẩn/hiện thông tin liên lạc
+        function toggleInfo() {
+            const infoDiv = document.getElementById("info");
+            const button = document.getElementById("infoButton");
+            const mainTitle = document.getElementById("mainTitle");
+            
+            if (infoDiv.style.display === "block") {
+                infoDiv.style.display = "none";
+                button.innerHTML = '<i class="fa-solid fa-address-card"></i> Nhận thông tin liên lạc';
+                mainTitle.innerText = "Xin chào, đây là web demo!";
+            } else {
+                infoDiv.style.display = "block";
+                button.innerHTML = '<i class="fa-solid fa-eye-slash"></i> Ẩn thông tin';
+                mainTitle.innerText = "Thông tin liên lạc của Thế Anh";
+            }
+        }
+    </script>
+</body>
+</html>
